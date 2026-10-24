@@ -79,8 +79,19 @@ class TestIO(unittest.TestCase):
         mock_load.return_value = {"results": {"a": 1}, "layer_scores": {"b": 2}}
         
         results, scores = load_measurements("path.pt")
+        mock_load.assert_called_once_with("path.pt", weights_only=True)
         self.assertEqual(results["a"], 1)
         self.assertEqual(scores["b"], 2)
+
+    def test_measurements_round_trip_with_weights_only(self):
+        with TemporaryDirectory() as temp_dir:
+            path = os.path.join(temp_dir, "measurements.pt")
+            refusal = torch.tensor([1.0, -1.0])
+            save_measurements({"refuse_0": refusal}, {0: 0.75}, path)
+            results, scores = load_measurements(path)
+
+        self.assertTrue(torch.equal(results["refuse_0"], refusal))
+        self.assertEqual(scores, {0: 0.75})
 
     def test_load_data_txt(self):
         with patch("builtins.open", mock_open(read_data="line1\nline2")):
