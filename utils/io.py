@@ -115,11 +115,9 @@ def load_measurements(path: str) -> tuple[dict, dict]:
     if not os.path.exists(path):
         raise FileNotFoundError(f"Measurements file not found: {path}")
 
-    data = torch.load(
-        path, weights_only=False
-    )  # weights_only=False primarily for dict structure support, trusted source assumption
-    # In newer torch, weights_only=True is default. If it's just tensors in dict, it might work, but safer to warn/handle.
-    # Given we are saving a dict of tensors and a dict of floats, standard torch.save/load is fine.
+    # Measurement files contain tensors and primitive score values only.
+    # Do not execute arbitrary pickled objects from user-supplied files.
+    data = torch.load(path, weights_only=True)
 
     results = data["results"]
     layer_scores = data["layer_scores"]
