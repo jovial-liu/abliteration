@@ -196,14 +196,14 @@ def sparsify_tensor(
     Generic entry point for sparsification.
     """
     if method == "magnitude":
-        return magnitude_sparsify(tensor, threshold or 0.05)
+        return magnitude_sparsify(tensor, 0.05 if threshold is None else threshold)
     elif method == "percentile":
-        return percentile_sparsify(tensor, threshold or 0.95)
+        return percentile_sparsify(tensor, 0.95 if threshold is None else threshold)
     elif method == "topk":
         k = kwargs.get("k", int(0.1 * tensor.numel()))
         return topk_sparsify(tensor, k)
     elif method == "soft_threshold":
-        return soft_threshold_sparsify(tensor, threshold or 0.01)
+        return soft_threshold_sparsify(tensor, 0.01 if threshold is None else threshold)
     else:
         raise ValueError(f"Unknown method: {method}")
 
