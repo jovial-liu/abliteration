@@ -89,6 +89,14 @@ class TestMathUtils(unittest.TestCase):
         expected = torch.tensor([1.0, 0.5, 0.0, 0.0, -1.0])
         self.assertTrue(torch.allclose(result, expected))
 
+    def test_sparsify_tensor_explicit_zero_threshold(self):
+        # Zero is a valid threshold, not a request to use the default.
+        tensor = torch.tensor([0.01, 0.1, -1.0])
+        for method in ("magnitude", "percentile", "soft_threshold"):
+            with self.subTest(method=method):
+                result = sparsify_tensor(tensor, method=method, threshold=0.0)
+                self.assertTrue(torch.allclose(result, tensor))
+
     def test_topk_sparsify(self):
         tensor = torch.tensor([0.1, 0.5, 0.2, 0.9])
         # top 2: 0.9, 0.5
