@@ -170,11 +170,11 @@ def topk_sparsify(vector: torch.Tensor, k: int) -> torch.Tensor:
     """
     Keep only the top k components by magnitude.
     """
-    flat_vector = vector.view(-1)
+    flat_vector = vector.reshape(-1)
     _, indices = torch.topk(torch.abs(flat_vector), min(k, flat_vector.numel()))
     mask = torch.zeros_like(flat_vector, dtype=torch.bool)
     mask[indices] = True
-    return vector * mask.view(vector.shape)
+    return vector * mask.reshape(vector.shape)
 
 
 def soft_threshold_sparsify(
