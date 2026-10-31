@@ -96,6 +96,14 @@ class TestMathUtils(unittest.TestCase):
         expected = torch.tensor([0.0, 0.5, 0.0, 0.9])
         self.assertTrue(torch.allclose(result, expected))
 
+    def test_topk_sparsify_noncontiguous(self):
+        # Transposed tensors have non-contiguous strides; top-k should still work.
+        tensor = torch.tensor([[1.0, 4.0, 2.0], [5.0, 3.0, 6.0]]).T
+        self.assertFalse(tensor.is_contiguous())
+        expected = torch.tensor([[0.0, 5.0], [0.0, 0.0], [0.0, 6.0]])
+        self.assertTrue(torch.equal(topk_sparsify(tensor, k=2), expected))
+        self.assertTrue(torch.equal(sparsify_tensor(tensor, method="topk", k=2), expected))
+
     def test_sparsity_stats(self):
         tensor = torch.tensor([1.0, 0.0, 0.0, 0.0])
         stats = sparsity_stats(tensor)
